@@ -1,0 +1,424 @@
+local player = game.Players.LocalPlayer
+local correctCode = "GvhyCt6Bisj678BIsGNGer" -- Updated key
+
+local TweenService = game:GetService("TweenService")
+local UIS = game:GetService("UserInputService")
+local RunService = game:GetService("RunService")
+local StarterGui = game:GetService("StarterGui")
+local Debris = game:GetService("Debris")
+
+local screenGui = Instance.new("ScreenGui")
+
+-- Main Frame
+local frame = Instance.new("Frame", screenGui)
+frame.Size = UDim2.new(0.4, 0, 0.3, 0)
+frame.Position = UDim2.new(0.3, 0, 0.35, 0)
+frame.BackgroundColor3 = Color3.new(0.1, 0.1, 0.1)
+frame.BorderSizePixel = 0
+frame.Style = Enum.FrameStyle.RobloxRound
+
+-- Title Label
+local titleLabel = Instance.new("TextLabel", frame)
+titleLabel.Size = UDim2.new(1, 0, 0.25, 0)
+titleLabel.Text = "Kitler's Key System"
+titleLabel.TextColor3 = Color3.new(1, 1, 1)
+titleLabel.BackgroundTransparency = 1
+titleLabel.TextScaled = true
+titleLabel.Font = Enum.Font.GothamBold
+
+-- Key Input TextBox
+local textBox = Instance.new("TextBox", frame)
+textBox.Size = UDim2.new(1, -20, 0.2, 0)
+textBox.Position = UDim2.new(0, 10, 0.25, 0)
+textBox.BackgroundColor3 = Color3.new(1, 1, 1)
+textBox.TextColor3 = Color3.new(0, 0, 0)
+textBox.TextScaled = true
+textBox.PlaceholderText = "Enter code here"
+textBox.TextStrokeTransparency = 0.5
+
+-- Submit Button
+local submitButton = Instance.new("TextButton", frame)
+submitButton.Size = UDim2.new(1, -20, 0.25, 0)
+submitButton.Position = UDim2.new(0, 10, 0.55, 0)
+submitButton.Text = "Submit"
+submitButton.BackgroundColor3 = Color3.new(0.1, 0.8, 0.1)
+submitButton.TextColor3 = Color3.new(1, 1, 1)
+submitButton.TextScaled = true
+submitButton.Font = Enum.Font.GothamBold
+submitButton.BorderSizePixel = 0
+
+-- Credits Label
+local creditsLabel = Instance.new("TextLabel", frame)
+creditsLabel.Size = UDim2.new(1, 0, 0.1, 0)
+creditsLabel.Position = UDim2.new(0, 0, 1, 0)
+creditsLabel.BackgroundTransparency = 1
+creditsLabel.Text = "Credits to alxpox for the UI!"
+creditsLabel.TextColor3 = Color3.new(1, 1, 1)
+creditsLabel.TextScaled = true
+creditsLabel.Font = Enum.Font.Gotham
+
+-- Message Label
+local messageLabel = Instance.new("TextLabel", screenGui)
+messageLabel.Size = UDim2.new(1, 0, 0.1, 0)
+messageLabel.Position = UDim2.new(0, 0, 0.65, 0)
+messageLabel.BackgroundTransparency = 1
+messageLabel.TextScaled = true
+messageLabel.Font = Enum.Font.GothamBold
+messageLabel.Visible = false
+
+-- Moving Text
+local movingText = Instance.new("TextLabel", screenGui)
+movingText.Size = UDim2.new(1, 0, 0.1, 0)
+movingText.Position = UDim2.new(0, 0, -0.1, 0)
+movingText.Text = "Kitler's Experiment"
+movingText.TextColor3 = Color3.new(1, 1, 1)
+movingText.BackgroundTransparency = 1
+movingText.TextScaled = true
+movingText.Font = Enum.Font.GothamBold
+movingText.Visible = false
+
+-- Tween for moving text
+local tweenInfo = TweenInfo.new(2, Enum.EasingStyle.Linear, Enum.EasingDirection.InOut)
+local goal = {Position = UDim2.new(0, 0, 0.5, -25)}
+local tween = TweenService:Create(movingText, tweenInfo, goal)
+
+-- Drop-down Frame
+local dropDownFrame
+
+-- Function to handle the Anti AFK
+local function startAntiAFK()
+    local lastJumpTime = tick()
+
+    -- Notify and print
+    local notification = Instance.new("TextLabel")
+    notification.Size = UDim2.new(0, 200, 0, 50)
+    notification.Position = UDim2.new(0.5, -100, 0.5, -25)
+    notification.BackgroundColor3 = Color3.new(0, 0, 0)
+    notification.BackgroundTransparency = 0.5
+    notification.TextColor3 = Color3.new(1, 1, 1)
+    notification.Text = "Anti AFK now running"
+    notification.TextScaled = true
+    notification.Parent = screenGui
+
+    wait(3) -- Show notification for 3 seconds
+    notification:Destroy()
+
+    print("Anti AFK now running")
+
+    while true do
+        local jumpInterval = math.random(1, 20 * 60) -- Random interval between 1 second and 20 minutes
+        wait(jumpInterval)
+
+        -- Make player jump
+        if player.Character and player.Character:FindFirstChild("Humanoid") then
+            local humanoid = player.Character.Humanoid
+            humanoid:ChangeState(Enum.HumanoidStateType.Physics)
+            humanoid:ChangeState(Enum.HumanoidStateType.GettingUp)
+            humanoid:Move(Vector3.new(0, 1, 0)) -- Make the player jump
+
+            -- Notification and console print
+            local currentTime = tick()
+            local timeElapsed = math.floor((currentTime - lastJumpTime) / 60)
+            lastJumpTime = currentTime
+
+            local jumpNotification = Instance.new("TextLabel")
+            jumpNotification.Size = UDim2.new(0, 200, 0, 50)
+            jumpNotification.Position = UDim2.new(0.5, -100, 0.5, -25)
+            jumpNotification.BackgroundColor3 = Color3.new(0, 0, 0)
+            jumpNotification.BackgroundTransparency = 0.5
+            jumpNotification.TextColor3 = Color3.new(1, 1, 1)
+            jumpNotification.Text = "Player jumped at " .. timeElapsed .. " minutes"
+            jumpNotification.TextScaled = true
+            jumpNotification.Parent = screenGui
+
+            wait(3) -- Show notification for 3 seconds
+            jumpNotification:Destroy()
+
+            print("Player jumped at " .. timeElapsed .. " minutes")
+        end
+    end
+end
+
+-- Create Open Button when movingText reaches center
+local function onTweenCompleted()
+    -- Hide the moving text
+    movingText.Visible = false
+
+    -- Create the Open Button
+    local openButton = Instance.new("TextButton")
+    openButton.Size = UDim2.new(0, 100, 0, 50)
+    openButton.Position = UDim2.new(0.5, -50, 0.5, -25)
+    openButton.Text = "Open"
+    openButton.BackgroundColor3 = Color3.new(0.3, 0.3, 0.3)
+    openButton.TextColor3 = Color3.new(1, 1, 1)
+    openButton.Parent = screenGui
+
+    -- Draggable UI function
+    local function makeDraggable(gui)
+        local dragging
+        local dragInput
+        local dragStart
+        local startPos
+
+        local function update(input)
+            local delta = input.Position - dragStart
+            gui.Position =
+                UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+        end
+
+        gui.InputBegan:Connect(
+            function(input)
+                if
+                    input.UserInputType == Enum.UserInputType.MouseButton1 or
+                        input.UserInputType == Enum.UserInputType.Touch
+                 then
+                    dragging = true
+                    dragStart = input.Position
+                    startPos = gui.Position
+
+                    input.Changed:Connect(
+                        function()
+                            if input.UserInputState == Enum.UserInputState.End then
+                                dragging = false
+                            end
+                        end
+                    )
+                end
+            end
+        )
+
+        gui.InputChanged:Connect(
+            function(input)
+                if
+                    input.UserInputType == Enum.UserInputType.MouseMovement or
+                        input.UserInputType == Enum.UserInputType.Touch
+                 then
+                    dragInput = input
+                end
+            end
+        )
+
+        UIS.InputChanged:Connect(
+            function(input)
+                if dragging and input == dragInput then
+                    update(input)
+                end
+            end
+        )
+    end
+
+    -- Make Open Button draggable
+    makeDraggable(openButton)
+
+    -- Function to handle the Open Button click
+    local function onOpenClick()
+        if dropDownFrame then
+            dropDownFrame.Visible = not dropDownFrame.Visible
+        else
+            -- Create the drop-down UI
+            dropDownFrame = Instance.new("Frame")
+            dropDownFrame.Size = UDim2.new(0.5, 0, 0.6, 0) -- Increased size
+            dropDownFrame.Position = UDim2.new(0.5, -175, 0.5, -150) -- Centered position
+            dropDownFrame.BackgroundColor3 = Color3.new(0.2, 0.2, 0.2)
+            dropDownFrame.BorderSizePixel = 0
+            dropDownFrame.Parent = screenGui
+
+            -- Drop-down Label
+            local dropDownLabel = Instance.new("TextLabel")
+            dropDownLabel.Size = UDim2.new(1, 0, 0.25, 0)
+            dropDownLabel.Text = "Kitler's Experiment"
+            dropDownLabel.BackgroundTransparency = 1
+            dropDownLabel.TextColor3 = Color3.new(1, 1, 1)
+            dropDownLabel.TextScaled = true
+            dropDownLabel.Font = Enum.Font.GothamBold
+            dropDownLabel.Parent = dropDownFrame
+
+            -- IY Button
+            local iyButton = Instance.new("TextButton")
+            iyButton.Size = UDim2.new(0, 150, 0, 50) -- Increased size
+            iyButton.Position = UDim2.new(0.5, -75, 0.25, 0)
+            iyButton.Text = "IY"
+            iyButton.BackgroundColor3 = Color3.new(0.1, 0.8, 0.1)
+            iyButton.TextColor3 = Color3.new(1, 1, 1)
+            iyButton.Parent = dropDownFrame
+
+            iyButton.MouseButton1Click:Connect(
+                function()
+                    loadstring(game:HttpGet("https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source"))()
+                end
+            )
+
+            -- Anti AFK Button
+            local antiAFKButton = Instance.new("TextButton")
+            antiAFKButton.Size = UDim2.new(0, 150, 0, 50) -- Increased size
+            antiAFKButton.Position = UDim2.new(0.5, -75, 0.5, 0)
+            antiAFKButton.Text = "Anti AFK"
+            antiAFKButton.BackgroundColor3 = Color3.new(0.8, 0.1, 0.1)
+            antiAFKButton.TextColor3 = Color3.new(1, 1, 1)
+            antiAFKButton.Parent = dropDownFrame
+
+            antiAFKButton.MouseButton1Click:Connect(
+                function()
+                    -- Notify that Anti AFK is running
+                    local notification = Instance.new("TextLabel")
+                    notification.Size = UDim2.new(0, 200, 0, 50)
+                    notification.Position = UDim2.new(0.5, -100, 0.5, -25)
+                    notification.BackgroundColor3 = Color3.new(0, 0, 0)
+                    notification.BackgroundTransparency = 0.5
+                    notification.TextColor3 = Color3.new(1, 1, 1)
+                    notification.Text = "Anti AFK now running"
+                    notification.TextScaled = true
+                    notification.Parent = screenGui
+
+                    wait(3) -- Show notification for 3 seconds
+                    notification:Destroy()
+
+                    print("Anti AFK now running")
+
+                    -- Start Anti AFK
+                    startAntiAFK()
+                end
+            )
+
+            -- Tween Service Button
+            local tweenServiceButton = Instance.new("TextButton")
+            tweenServiceButton.Size = UDim2.new(0, 150, 0, 50) -- Increased size
+            tweenServiceButton.Position = UDim2.new(0.5, -75, 0.75, 0)
+            tweenServiceButton.Text = "Tween Service"
+            tweenServiceButton.BackgroundColor3 = Color3.new(0.1, 0.6, 0.9)
+            tweenServiceButton.TextColor3 = Color3.new(1, 1, 1)
+            tweenServiceButton.Parent = dropDownFrame
+
+            tweenServiceButton.MouseButton1Click:Connect(
+                function()
+                    -- Create Tween UI
+                    local tweenUI = Instance.new("Frame")
+                    tweenUI.Size = UDim2.new(0.4, 0, 0.3, 0)
+                    tweenUI.Position = UDim2.new(0.3, 0, 0.35, 0)
+                    tweenUI.BackgroundColor3 = Color3.new(0.1, 0.1, 0.1)
+                    tweenUI.BorderSizePixel = 0
+                    tweenUI.Style = Enum.FrameStyle.RobloxRound
+                    tweenUI.Parent = screenGui
+
+                    -- Tween Title Label
+                    local tweenTitle = Instance.new("TextLabel", tweenUI)
+                    tweenTitle.Size = UDim2.new(1, 0, 0.25, 0)
+                    tweenTitle.Text = "Kitler's Tween"
+                    tweenTitle.TextColor3 = Color3.new(1, 1, 1)
+                    tweenTitle.BackgroundTransparency = 1
+                    tweenTitle.TextScaled = true
+                    tweenTitle.Font = Enum.Font.GothamBold
+
+                    -- Distance Input TextBox
+                    local distanceBox = Instance.new("TextBox", tweenUI)
+                    distanceBox.Size = UDim2.new(1, -20, 0.2, 0)
+                    distanceBox.Position = UDim2.new(0, 10, 0.25, 0)
+                    distanceBox.BackgroundColor3 = Color3.new(1, 1, 1)
+                    distanceBox.TextColor3 = Color3.new(0, 0, 0)
+                    distanceBox.TextScaled = true
+                    distanceBox.PlaceholderText = "Enter distance (1-200)"
+                    distanceBox.TextStrokeTransparency = 0.5
+
+                    -- Teleport Button
+                    local teleportButton = Instance.new("TextButton", tweenUI)
+                    teleportButton.Size = UDim2.new(1, -20, 0.25, 0)
+                    teleportButton.Position = UDim2.new(0, 10, 0.55, 0)
+                    teleportButton.Text = "Teleport"
+                    teleportButton.BackgroundColor3 = Color3.new(0.1, 0.8, 0.1)
+                    teleportButton.TextColor3 = Color3.new(1, 1, 1)
+                    teleportButton.TextScaled = true
+                    teleportButton.Font = Enum.Font.GothamBold
+                    teleportButton.BorderSizePixel = 0
+
+                    -- Close Button
+                    local closeButton = Instance.new("TextButton", tweenUI)
+                    closeButton.Size = UDim2.new(0, 50, 0, 50)
+                    closeButton.Position = UDim2.new(1, -60, 0, 10)
+                    closeButton.Text = "X"
+                    closeButton.BackgroundColor3 = Color3.new(1, 0, 0)
+                    closeButton.TextColor3 = Color3.new(1, 1, 1)
+                    closeButton.TextScaled = true
+                    closeButton.Font = Enum.Font.GothamBold
+                    closeButton.BorderSizePixel = 0
+
+                    local minimized = false
+
+                    -- Minimize and Restore UI
+                    local function toggleUI()
+                        if minimized then
+                            tweenUI.Size = UDim2.new(0.4, 0, 0.3, 0)
+                            tweenUI.Position = UDim2.new(0.3, 0, 0.35, 0)
+                            closeButton.Position = UDim2.new(1, -60, 0, 10)
+                        else
+                            tweenUI.Size = UDim2.new(0, 50, 0, 50)
+                            tweenUI.Position = UDim2.new(0.5, -25, 0.5, -25)
+                            closeButton.Position = UDim2.new(0, 10, 0, 10)
+                        end
+                        minimized = not minimized
+                    end
+
+                    closeButton.MouseButton1Click:Connect(toggleUI)
+
+                    -- Teleport Function
+                    teleportButton.MouseButton1Click:Connect(
+                        function()
+                            local distance = tonumber(distanceBox.Text)
+                            if distance and distance >= 1 and distance <= 200 then
+                                local character = player.Character
+                                if character and character:FindFirstChild("HumanoidRootPart") then
+                                    local humanoidRootPart = character.HumanoidRootPart
+                                    local direction = humanoidRootPart.CFrame.LookVector
+                                    humanoidRootPart.CFrame = humanoidRootPart.CFrame + direction * distance
+                                end
+                            else
+                                messageLabel.TextColor3 = Color3.new(1, 0, 0)
+                                messageLabel.Text = "Invalid distance. Enter a number between 1 and 200."
+                                messageLabel.Visible = true
+                                wait(3)
+                                messageLabel.Visible = false
+                            end
+                        end
+                    )
+
+                    -- Make Tween UI draggable
+                    makeDraggable(tweenUI)
+                end
+            )
+
+            -- Make drop-down frame draggable
+            makeDraggable(dropDownFrame)
+        end
+    end
+
+    openButton.MouseButton1Click:Connect(onOpenClick)
+end
+
+-- Function to handle the submission of the key
+submitButton.MouseButton1Click:Connect(
+    function()
+        local enteredCode = textBox.Text
+
+        if enteredCode == correctCode then
+            -- Hide the key system UI
+            titleLabel.Visible = false
+            textBox.Visible = false
+            submitButton.Visible = false
+            creditsLabel.Visible = false
+            frame.Visible = false
+
+            -- Show the moving text
+            movingText.Visible = true
+            tween:Play()
+            tween.Completed:Connect(onTweenCompleted)
+        else
+            messageLabel.TextColor3 = Color3.new(1, 0, 0)
+            messageLabel.Text = "Incorrect code. Try again."
+            messageLabel.Visible = true
+            wait(3)
+            messageLabel.Visible = false
+        end
+    end
+)
+
+-- Parent screenGui to the player's PlayerGui
+screenGui.Parent = player:WaitForChild("PlayerGui")
