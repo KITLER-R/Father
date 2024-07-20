@@ -1,0 +1,128 @@
+local player = game.Players.LocalPlayer
+local TweenService = game:GetService("TweenService")
+local UserInputService = game:GetService("UserInputService")
+local mouse = player:GetMouse()
+local UIS = UserInputService
+
+-- Create the ScreenGui
+local screenGui = Instance.new("ScreenGui")
+screenGui.Parent = player:WaitForChild("PlayerGui")
+
+-- Create the Main Frame
+local frame = Instance.new("Frame")
+frame.Size = UDim2.new(0.3, 0, 0.3, 0)
+frame.Position = UDim2.new(0.35, 0, 0.35, 0)
+frame.BackgroundColor3 = Color3.new(0.2, 0.2, 0.2)
+frame.BorderSizePixel = 0
+frame.Parent = screenGui
+
+-- Create the Title Label
+local titleLabel = Instance.new("TextLabel")
+titleLabel.Size = UDim2.new(1, 0, 0.2, 0)
+titleLabel.Position = UDim2.new(0, 0, 0, 0)
+titleLabel.Text = "Teleport by Studs"
+titleLabel.TextColor3 = Color3.new(1, 1, 1)
+titleLabel.BackgroundTransparency = 1
+titleLabel.TextScaled = true
+titleLabel.Font = Enum.Font.GothamBold
+titleLabel.Parent = frame
+
+-- Create the TextBox
+local textBox = Instance.new("TextBox")
+textBox.Size = UDim2.new(0.8, 0, 0.2, 0)
+textBox.Position = UDim2.new(0.1, 0, 0.25, 0)
+textBox.BackgroundColor3 = Color3.new(1, 1, 1)
+textBox.TextColor3 = Color3.new(0, 0, 0)
+textBox.PlaceholderText = "Enter number (max 200)"
+textBox.TextScaled = true
+textBox.Font = Enum.Font.Gotham
+textBox.Parent = frame
+
+-- Create the Teleport Button
+local teleportButton = Instance.new("TextButton")
+teleportButton.Size = UDim2.new(0.8, 0, 0.2, 0)
+teleportButton.Position = UDim2.new(0.1, 0, 0.55, 0)
+teleportButton.Text = "Teleport"
+teleportButton.BackgroundColor3 = Color3.new(0.3, 0.8, 0.3)
+teleportButton.TextColor3 = Color3.new(1, 1, 1)
+teleportButton.TextScaled = true
+teleportButton.Font = Enum.Font.GothamBold
+teleportButton.Parent = frame
+
+-- Function to handle teleportation
+local function teleportPlayer()
+    local inputValue = tonumber(textBox.Text)
+
+    if inputValue and inputValue > 0 and inputValue <= 200 then
+        local character = player.Character
+        if character and character:FindFirstChild("HumanoidRootPart") then
+            local humanoidRootPart = character.HumanoidRootPart
+            local currentPosition = humanoidRootPart.Position
+            local direction = humanoidRootPart.CFrame.LookVector
+            humanoidRootPart.CFrame = CFrame.new(currentPosition + direction * inputValue)
+        end
+    else
+        -- Notify user about invalid input
+        local notification = Instance.new("TextLabel")
+        notification.Size = UDim2.new(0, 200, 0, 50)
+        notification.Position = UDim2.new(0.5, -100, 0.8, 0)
+        notification.BackgroundColor3 = Color3.new(1, 0, 0)
+        notification.BackgroundTransparency = 0.5
+        notification.TextColor3 = Color3.new(1, 1, 1)
+        notification.Text = "Invalid input! Enter a number between 1 and 200."
+        notification.TextScaled = true
+        notification.Parent = screenGui
+
+        wait(3) -- Show notification for 3 seconds
+        notification:Destroy()
+    end
+end
+
+-- Connect button click to teleport function
+teleportButton.MouseButton1Click:Connect(teleportPlayer)
+
+-- Dragging Mechanic
+local dragging
+local dragInput
+local dragStart
+local startPos
+
+local function update(input)
+    local delta = input.Position - dragStart
+    frame.Position =
+        UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+end
+
+frame.InputBegan:Connect(
+    function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+            dragging = true
+            dragStart = input.Position
+            startPos = frame.Position
+
+            input.Changed:Connect(
+                function()
+                    if input.UserInputState == Enum.UserInputState.End then
+                        dragging = false
+                    end
+                end
+            )
+        end
+    end
+)
+
+frame.InputChanged:Connect(
+    function(input)
+        if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
+            dragInput = input
+        end
+    end
+)
+
+UIS.InputChanged:Connect(
+    function(input)
+        if dragging and input == dragInput then
+            update(input)
+        end
+    end
+)
