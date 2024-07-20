@@ -11,12 +11,12 @@ MakeWindow({
   Key = {
     KeySystem = true,
     Title = "Key System",
-    Description = "Join discord (key: Kitler's Main)",
-    KeyLink = "https://discord.com/invite/jErmFfMfQR",
-    Keys = {"Kitler's Main"},
+    Description = "Join discord (check announcement pins)",
+    KeyLink = "https://discord.com/invite/HCgk9szkDw",
+    Keys = {"GvhyCt6Bisj678BIsGNGer"},
     Notifi = {
       Notifications = true,
-      CorrectKey = "Running the Script lil bro...",
+      CorrectKey = "Running the Script Please wait...",
       Incorrectkey = "The key is incorrect lol",
       CopyKeyLink = "Copied to Clipboard"
     }
@@ -594,3 +594,4 @@ task.spawn(function()
 end)
 
 initializate('nurysium_temp')
+print("Script is working")
