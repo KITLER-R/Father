@@ -1,0 +1,120 @@
+getgenv().AutoParry = true
+
+local Players = game:GetService("Players")
+local SocialService = game:GetService("SocialService")
+local StatsService = game:GetService("Stats")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+local Player = Players.LocalPlayer
+local Camera = workspace.CurrentCamera
+
+local Parried = false
+local Targeted = false
+local Opponent = nil
+local Event = nil
+
+local Sphere = Instance.new("Part")
+Sphere.Material = Enum.Material.ForceField
+Sphere.Anchored = true
+Sphere.CanCollide = false
+Sphere.Parent = workspace
+Sphere.CastShadow = false
+Sphere.Shape = Enum.PartType.Ball
+
+function Parry()
+    local Cf = Camera.CFrame
+    local X, Y, Z, R00, R01, R02, R10, R11, R12, R20, R21, R22 = Cf:GetComponents()
+
+    local Args = {
+        [1] = 0,
+        [2] = CFrame.new(X, Y, Z, R00, R01, R02, R10, R11, R12, R20, R21, R22),
+        [3] = {},
+        [4] = {
+            [1] = Camera.ViewportSize.X / 2,
+            [2] = Camera.ViewportSize.Y / 2
+        },
+        [5] = false
+    }
+
+    Event = Event or SocialService:WaitForChild("\n")
+
+    if Event then
+        Event:FireServer(unpack(Args))
+    end
+end
+
+function GetBall()
+    local RealBall = nil
+
+    for _, Ball in pairs(workspace.Balls:GetChildren()) do
+        if not Ball:GetAttribute("realBall") then
+            continue
+        end
+
+        RealBall = Ball
+        break
+    end
+
+    return RealBall
+end
+local Parried = false
+task.spawn(function()
+    while getgenv().AutoParry do
+        task.wait()
+
+        local Character = Player.Character
+        if not Character or not Character:FindFirstChild("HumanoidRootPart") then
+            continue
+        end
+
+        local Ball = GetBall()
+        if not Ball then
+            continue
+        end
+
+        local Hrp = Character:FindFirstChild("HumanoidRootPart")
+        local Distance = (Hrp.Position - Ball.Position).Magnitude
+        local Speed = Ball.AssemblyLinearVelocity.Magnitude
+        local Ping = (game.Stats.Network.ServerStatsItem["Data Ping"]:GetValue())
+        Distance -= Speed * Ping / 1000
+        
+        local DesiredVelocity = (Hrp.Position - Ball.Position).Unit
+        local ActualVelocity = Ball.AssemblyLinearVelocity.Unit
+        local Difference = (ActualVelocity - DesiredVelocity)
+        local Curve = Difference.Magnitude / 2
+        local Radius = (Speed * 0.5) * (1 + (Curve / 4))
+
+        if Ball:GetAttribute("target") ~= Player.Name then
+            Opponent = Players:FindFirstChild(Ball:GetAttribute("target")) or workspace.Alive:FindFirstChild(Ball:GetAttribute("target"))
+            Opponent = Opponent and Opponent:IsA("Player") and Opponent.Character or Opponent
+        end
+
+        local OpponentDistance = Opponent and Opponent:FindFirstChild("HumanoidRootPart") and (Hrp.Position - Opponent.HumanoidRootPart.Position).Magnitude or 99999
+        
+        local PingCompensator = (Ping / 50)
+        local CalculatedDistanceToParry = 10 + Speed / 3.67 + PingCompensator
+        
+        Sphere.CFrame = Hrp.CFrame
+        Sphere.Size = Vector3.new(Radius, Radius, Radius)
+        
+        if Distance <= CalculatedDistanceToParry and Ball:GetAttribute('target') == game.Players.LocalPlayer.Name and not Parried then
+                if Curve > 0.5 or Distance > Radius or Parried or Ball:GetAttribute("target") ~= Player.Name then
+                        continue
+                end
+                Parried = true
+                Parry()
+        Ball:GetAttributeChangedSignal('target'):Connect(function()
+            Parried = false
+        end)
+        local LastParry = time()
+        
+        task.spawn(function()
+            repeat
+                game:GetService('RunService').PreSimulation:Wait()
+            until (time() - LastParry) >= 2 or not Parried
+            Parried = false
+        end)
+        end
+                
+    end
+end)
