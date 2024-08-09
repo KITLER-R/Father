@@ -1,0 +1,49 @@
+local UIS = game:GetService("UserInputService")
+local Players = game:GetService("Players")
+local player = Players.LocalPlayer
+local camera = workspace.CurrentCamera
+
+-- Initial FOV settings
+local minFOV = 80
+local maxFOV = 200
+local currentFOV = camera.FieldOfView
+
+-- Create a ScreenGui for the slider
+local screenGui = Instance.new("ScreenGui")
+screenGui.Parent = player:WaitForChild("PlayerGui")
+
+-- Create the slider frame
+local sliderFrame = Instance.new("Frame")
+sliderFrame.Size = UDim2.new(0, 200, 0, 50)
+sliderFrame.Position = UDim2.new(0.5, -100, 0.9, -25)
+sliderFrame.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+sliderFrame.Parent = screenGui
+
+-- Create the slider button
+local sliderButton = Instance.new("TextButton")
+sliderButton.Size = UDim2.new(0, 20, 1, 0)
+sliderButton.Position = UDim2.new((currentFOV - minFOV) / (maxFOV - minFOV), 0, 0, 0)
+sliderButton.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+sliderButton.Text = ""
+sliderButton.Parent = sliderFrame
+
+local dragging = false
+
+sliderButton.MouseButton1Down:Connect(function()
+    dragging = true
+end)
+
+UIS.InputEnded:Connect(function(input, isProcessed)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+        dragging = false
+    end
+end)
+
+UIS.InputChanged:Connect(function(input, isProcessed)
+    if dragging and input.UserInputType == Enum.UserInputType.MouseMovement then
+        local x = math.clamp(input.Position.X - sliderFrame.AbsolutePosition.X, 0, sliderFrame.AbsoluteSize.X)
+        local fov = minFOV + (x / sliderFrame.AbsoluteSize.X) * (maxFOV - minFOV)
+        camera.FieldOfView = fov
+        sliderButton.Position = UDim2.new(x / sliderFrame.AbsoluteSize.X, 0, 0, 0)
+    end
+end)
